@@ -2,8 +2,8 @@ import React from 'react'
 
 const HomePage = () => {
   return (
-    <div>
-      
+    <div className='min-h-screen'>
+      <h1>Home Page Content</h1>
     </div>
   )
 }
