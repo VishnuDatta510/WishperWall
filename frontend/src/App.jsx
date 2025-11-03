@@ -8,7 +8,7 @@ import Navbar from './components/Navbar'
 
 const App = () => {
   return (
-    <div className='min-h-screen bg-base-100'>
+    <div className='min-h-screen bg-base-200'>
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
