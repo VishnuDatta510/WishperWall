@@ -30,14 +30,20 @@ app.use(rateLimiter);
 app.use("/api/notes" , noteRoutes);
 
 if(process.env.NODE_ENV === "production"){
-    app.use(express.static(path.join(__dirname , "../frontend/dist")))
-    app.get("/" , (req , res) => {
-    res.sendFile(path.join(__dirname, "../frontend" , "dist" , "index.html"));
+    app.use(express.static(path.join(__dirname , "/frontend/dist")))
+    app.get("/*" , (req , res) => {
+    res.sendFile(path.join(__dirname, "/frontend" , "dist" , "index.html"));
 })
 }
 
+// For local development
+if(process.env.NODE_ENV !== "production"){
+    connectDB().then(()=> {
+        app.listen(PORT , () => {
+            console.log(`Server Running on port ${PORT}`);
+        })
+    });
+}
 
-connectDB().then(()=> {
-app.listen(PORT , () => {
-    console.log(`Server Running on port ${PORT}`);
-})});
+// Export for Vercel
+export default app;
