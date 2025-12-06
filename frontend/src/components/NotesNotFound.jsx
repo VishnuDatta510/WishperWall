@@ -1,19 +1,17 @@
-import { NotebookIcon } from "lucide-react";
-import { Link } from "react-router";
+import { StickyNote } from "lucide-react";
 
 const NotesNotFound = () => {
   return (
     <div className="flex flex-col items-center justify-center py-16 space-y-6 max-w-md mx-auto text-center">
-      <div className="bg-primary/10 rounded-full p-8">
-        <NotebookIcon className="size-10 text-primary" />
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-8 transition-colors">
+        <StickyNote className="size-12 text-gray-400 dark:text-gray-500" />
       </div>
-      <h3 className="text-2xl font-bold">No notes yet</h3>
-      <p className="text-base-content/70">
-        Ready to organize your thoughts? Create your first note to get started on your journey.
+      <h3 className="text-2xl font-hand font-bold text-gray-700 dark:text-gray-200 transition-colors">
+        The wall is empty
+      </h3>
+      <p className="text-gray-500 dark:text-gray-400 font-sans transition-colors">
+        Be the first to stick a thought on the wall! Click the + button below.
       </p>
-      <Link to="/create" className="btn btn-primary">
-        Create Your First Note
-      </Link>
     </div>
   );
 };

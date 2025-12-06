@@ -1,8 +1,17 @@
 import Note from "../models/Note.js";
+import { Filter } from "bad-words";
 
-export async function getAllNotes(_, res) {
+export async function getAllNotes(req, res) {
   try {
-    const notes = await Note.find().sort({ createdAt: -1 }); // -1 will sort in desc. order (newest first)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const notes = await Note.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+      
     res.status(200).json(notes);
   } catch (error) {
     console.error("Error in getAllNotes controller", error);
@@ -23,10 +32,44 @@ export async function getNoteById(req, res) {
 
 export async function createNote(req, res) {
   try {
-    const { title, content } = req.body;
-    const note = new Note({ title, content });
+    const { title, content, color, expiresIn } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ message: "Title and content are required" });
+    }
+
+    // Profanity Filter
+    const filter = new Filter();
+    // Ensure common words are definitely caught
+    filter.addWords("fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "whore", "slut"); 
+    
+    const cleanTitle = filter.clean(title);
+    const cleanContent = filter.clean(content);
+    
+    console.log("--- CREATE NOTE DEBUG ---");
+    console.log("Input Content:", content);
+    console.log("Cleaned Content:", cleanContent);
+    console.log("ExpiresIn received:", expiresIn);
+    
+    // Calculate expiration
+    const hours = expiresIn ? parseInt(expiresIn) : 24;
+    console.log("Calculated Hours:", hours);
+    
+    const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
+
+    const note = new Note({ 
+      title: cleanTitle, 
+      content: cleanContent, 
+      color,
+      expiresAt 
+    });
 
     const savedNote = await note.save();
+
+    // Emit socket event
+    const io = req.app.get("io");
+    io.emit("new-note", savedNote);
+
     res.status(201).json(savedNote);
   } catch (error) {
     console.error("Error in createNote controller", error);
@@ -61,6 +104,49 @@ export async function deleteNote(req, res) {
     res.status(200).json({ message: "Note deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteNote controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function reactToNote(req, res) {
+  try {
+    const { reactionType } = req.body;
+    const note = await Note.findById(req.params.id);
+    
+    if (!note) return res.status(404).json({ message: "Note not found" });
+
+    // Initialize reactions map if it doesn't exist (for old notes)
+    if (!note.reactions) {
+      note.reactions = new Map();
+    }
+
+    const currentCount = note.reactions.get(reactionType) || 0;
+    note.reactions.set(reactionType, currentCount + 1);
+
+    await note.save();
+    res.status(200).json(note);
+  } catch (error) {
+    console.error("Error in reactToNote controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function reportNote(req, res) {
+  try {
+    const note = await Note.findById(req.params.id);
+    if (!note) return res.status(404).json({ message: "Note not found" });
+
+    note.reports = (note.reports || 0) + 1;
+
+    if (note.reports >= 5) {
+      await Note.findByIdAndDelete(req.params.id);
+      return res.status(200).json({ message: "Note removed due to reports" });
+    }
+
+    await note.save();
+    res.status(200).json({ message: "Report submitted" });
+  } catch (error) {
+    console.error("Error in reportNote controller", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

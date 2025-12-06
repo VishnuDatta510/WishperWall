@@ -2,14 +2,26 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 import notesRoutes from "./routes/notesRoutes.js";
 import { connectDB } from "./config/db.js";
-import rateLimiter from "./middleware/rateLimiter.js";
+// import rateLimiter from "./middleware/rateLimiter.js";
 
 dotenv.config();
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.NODE_ENV === "production" ? false : ["http://localhost:5173", "http://localhost:5174"],
+  },
+});
+
+// Make io available in routes
+app.set("io", io);
+
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
@@ -22,7 +34,7 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 app.use(express.json());
-app.use(rateLimiter);
+// app.use(rateLimiter);
 
 app.use("/api/notes", notesRoutes);
 
@@ -35,7 +47,8 @@ if (process.env.NODE_ENV === "production") {
 }
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log("Server started on PORT:", PORT);
+    console.log("✅ SERVER RESTARTED WITH LATEST CODE");
   });
 });

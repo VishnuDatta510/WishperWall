@@ -9,5 +9,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "framer-motion": "^12.23.25",
+    "html2canvas": "^1.4.1",
+    "react-intersection-observer": "^10.0.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "use-sound": "^5.0.0"
+  }
 }
