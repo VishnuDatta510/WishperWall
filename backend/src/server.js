@@ -15,7 +15,9 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NODE_ENV === "production" ? false : ["http://localhost:5173", "http://localhost:5174"],
+    origin: process.env.NODE_ENV === "production" 
+      ? ["https://wishper-wall-dw60sbtvo-vishnudatta510s-projects.vercel.app", "https://wishperwall.vercel.app"]
+      : ["http://localhost:5173", "http://localhost:5174"],
   },
 });
 
@@ -29,7 +31,13 @@ const __dirname = path.resolve();
 if (process.env.NODE_ENV !== "production") {
   app.use(
     cors({
-      origin: "http://localhost:5173",
+      origin: ["http://localhost:5173", "http://localhost:5174"],
+    })
+  );
+} else {
+  app.use(
+    cors({
+      origin: ["https://wishper-wall-dw60sbtvo-vishnudatta510s-projects.vercel.app", "https://wishperwall.vercel.app"],
     })
   );
 }

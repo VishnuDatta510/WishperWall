@@ -11,7 +11,11 @@ import { io } from "socket.io-client";
 import { useInView } from "react-intersection-observer";
 
 // Initialize socket connection
-const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5001");
+const socket = io(
+  import.meta.env.MODE === "development" 
+    ? "http://localhost:5001" 
+    : "https://wishperwall.onrender.com"
+);
 
 const HomePage = () => {
   const [notes, setNotes] = useState([]);
