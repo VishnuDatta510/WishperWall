@@ -18,7 +18,7 @@ const COLORS = [
 const CreateNoteModal = ({ isOpen, onClose, onNoteCreated }) => {
   const [content, setContent] = useState("");
   const [selectedColor, setSelectedColor] = useState(COLORS[0].value);
-  const [expiresIn, setExpiresIn] = useState("24"); // Default 24 hours
+  const [expiresIn, setExpiresIn] = useState("forever"); // Default forever
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [playStick] = useSound(SOUNDS.stick, { volume: 0.5 });
 
@@ -32,13 +32,13 @@ const CreateNoteModal = ({ isOpen, onClose, onNoteCreated }) => {
         title: "Anonymous Note",
         content,
         color: selectedColor,
-        expiresIn: parseInt(expiresIn),
+        expiresIn: expiresIn === "forever" ? null : parseInt(expiresIn),
       });
       playStick();
       // onNoteCreated(res.data); // Socket will handle this now
       setContent("");
       setSelectedColor(COLORS[0].value);
-      setExpiresIn("24");
+      setExpiresIn("forever");
       onClose();
       toast.success("Note stuck to the wall!");
     } catch (error) {
@@ -92,6 +92,7 @@ const CreateNoteModal = ({ isOpen, onClose, onNoteCreated }) => {
                     onChange={(e) => setExpiresIn(e.target.value)}
                     className="bg-black/5 border-none rounded-lg px-2 py-1 text-xs focus:ring-0 cursor-pointer outline-none"
                   >
+                    <option value="forever">Forever</option>
                     <option value="24">1 Day</option>
                     <option value="72">3 Days</option>
                     <option value="168">7 Days</option>

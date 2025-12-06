@@ -51,17 +51,22 @@ export async function createNote(req, res) {
     console.log("Cleaned Content:", cleanContent);
     console.log("ExpiresIn received:", expiresIn);
     
-    // Calculate expiration
-    const hours = expiresIn ? parseInt(expiresIn) : 24;
-    console.log("Calculated Hours:", hours);
-    
-    const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
+    // Calculate expiration - null means forever (no expiration)
+    let expiresAt = null;
+    if (expiresIn !== null && expiresIn !== undefined) {
+      const hours = parseInt(expiresIn);
+      expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
+      console.log("Calculated Hours:", hours);
+      console.log("ExpiresAt:", expiresAt);
+    } else {
+      console.log("Note set to never expire (forever)");
+    }
 
     const note = new Note({ 
       title: cleanTitle, 
       content: cleanContent, 
       color,
-      expiresAt 
+      ...(expiresAt && { expiresAt })
     });
 
     const savedNote = await note.save();

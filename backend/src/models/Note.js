@@ -28,8 +28,8 @@ const noteSchema = new mongoose.Schema(
     },
     expiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
-      index: { expires: '0s' }, // TTL index: document is deleted when expiresAt is reached
+      required: false, // Optional - null means note never expires
+      index: { expires: '0s' }, // TTL index: document is deleted when expiresAt is reached (only if set)
     },
   },
   { timestamps: true } // createdAt, updatedAt

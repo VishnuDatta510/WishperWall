@@ -34,7 +34,7 @@ const NoteCard = ({ note, setNotes }) => {
 
   // Calculate time left (Dynamic based on expiresAt)
   const timeLeft = useMemo(() => {
-    if (!note.expiresAt) return "24h left"; // Fallback for old notes
+    if (!note.expiresAt) return null; // Forever notes don't show expiration
     
     const expiresAt = new Date(note.expiresAt);
     const now = new Date();
@@ -187,9 +187,11 @@ const NoteCard = ({ note, setNotes }) => {
           <span className="text-xs font-medium text-gray-500/60 font-sans">
             {formatDate(new Date(note.createdAt))}
           </span>
-          <span className="text-[10px] font-medium text-red-400/60 font-sans">
-            {timeLeft}
-          </span>
+          {timeLeft && (
+            <span className="text-[10px] font-medium text-red-400/60 font-sans">
+              {timeLeft}
+            </span>
+          )}
         </div>
       </div>
 
