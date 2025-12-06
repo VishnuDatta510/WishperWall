@@ -13,11 +13,18 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://wishper-wall.vercel.app",
+  "https://wishper-wall-7vf8cropd-vishnudatta510s-projects.vercel.app"
+];
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NODE_ENV === "production" 
-      ? ["https://wishper-wall-dw60sbtvo-vishnudatta510s-projects.vercel.app", "https://wishperwall.vercel.app"]
-      : ["http://localhost:5173", "http://localhost:5174"],
+    origin: allowedOrigins,
+    credentials: true,
   },
 });
 
@@ -28,19 +35,12 @@ const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
 // middleware
-if (process.env.NODE_ENV !== "production") {
-  app.use(
-    cors({
-      origin: ["http://localhost:5173", "http://localhost:5174"],
-    })
-  );
-} else {
-  app.use(
-    cors({
-      origin: ["https://wishper-wall-dw60sbtvo-vishnudatta510s-projects.vercel.app", "https://wishperwall.vercel.app"],
-    })
-  );
-}
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 app.use(express.json());
 // app.use(rateLimiter);
 
