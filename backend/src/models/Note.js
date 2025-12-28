@@ -1,8 +1,5 @@
 import mongoose from "mongoose";
 
-// 1st step: You need to create a schema
-// 2nd step: You would create a model based off of that schema
-
 const noteSchema = new mongoose.Schema(
   {
     title: {
@@ -15,7 +12,7 @@ const noteSchema = new mongoose.Schema(
     },
     color: {
       type: String,
-      default: "#FEF3C7", // Default light yellow
+      default: "#FEF3C7",
     },
     reactions: {
       type: Map,
@@ -28,11 +25,11 @@ const noteSchema = new mongoose.Schema(
     },
     expiresAt: {
       type: Date,
-      required: false, // Optional - null means note never expires
-      index: { expires: '0s' }, // TTL index: document is deleted when expiresAt is reached (only if set)
+      required: false,
+      index: { expires: '0s' },
     },
   },
-  { timestamps: true } // createdAt, updatedAt
+  { timestamps: true }
 );
 
 const Note = mongoose.model("Note", noteSchema);

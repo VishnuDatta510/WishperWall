@@ -6,8 +6,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 import notesRoutes from "./routes/notesRoutes.js";
+import rateLimiter from "./middleware/rateLimiter.js";
 import { connectDB } from "./config/db.js";
-// import rateLimiter from "./middleware/rateLimiter.js";
 
 dotenv.config();
 
@@ -28,7 +28,6 @@ const io = new Server(httpServer, {
   },
 });
 
-// Make io available in routes
 app.set("io", io);
 
 const PORT = process.env.PORT || 5000;
@@ -42,7 +41,7 @@ app.use(
   })
 );
 app.use(express.json());
-// app.use(rateLimiter);
+app.use(rateLimiter);
 
 app.use("/api/notes", notesRoutes);
 

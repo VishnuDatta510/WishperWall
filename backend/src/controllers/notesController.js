@@ -11,7 +11,7 @@ export async function getAllNotes(req, res) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-      
+
     res.status(200).json(notes);
   } catch (error) {
     console.error("Error in getAllNotes controller", error);
@@ -40,18 +40,16 @@ export async function createNote(req, res) {
 
     // Profanity Filter
     const filter = new Filter();
-    // Ensure common words are definitely caught
-    filter.addWords("fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "whore", "slut"); 
-    
+    filter.addWords("fuck", "shit", "bitch", "asshole"); // sample words
+
     const cleanTitle = filter.clean(title);
     const cleanContent = filter.clean(content);
-    
+
     console.log("--- CREATE NOTE DEBUG ---");
     console.log("Input Content:", content);
     console.log("Cleaned Content:", cleanContent);
     console.log("ExpiresIn received:", expiresIn);
-    
-    // Calculate expiration - null means forever (no expiration)
+
     let expiresAt = null;
     if (expiresIn !== null && expiresIn !== undefined) {
       const hours = parseInt(expiresIn);
@@ -62,16 +60,15 @@ export async function createNote(req, res) {
       console.log("Note set to never expire (forever)");
     }
 
-    const note = new Note({ 
-      title: cleanTitle, 
-      content: cleanContent, 
+    const note = new Note({
+      title: cleanTitle,
+      content: cleanContent,
       color,
       ...(expiresAt && { expiresAt })
     });
 
     const savedNote = await note.save();
 
-    // Emit socket event
     const io = req.app.get("io");
     io.emit("new-note", savedNote);
 
@@ -117,10 +114,9 @@ export async function reactToNote(req, res) {
   try {
     const { reactionType } = req.body;
     const note = await Note.findById(req.params.id);
-    
+
     if (!note) return res.status(404).json({ message: "Note not found" });
 
-    // Initialize reactions map if it doesn't exist (for old notes)
     if (!note.reactions) {
       note.reactions = new Map();
     }

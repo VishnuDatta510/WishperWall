@@ -5,15 +5,14 @@ import api from "../lib/axios";
 import toast from "react-hot-toast";
 import NoteCard from "../components/NoteCard";
 import CreateNoteModal from "../components/CreateNoteModal";
-import RateLimitedUI from "../components/RateLimitedUI";
 import NotesNotFound from "../components/NotesNotFound";
 import { io } from "socket.io-client";
 import { useInView } from "react-intersection-observer";
 
 // Initialize socket connection
 const socket = io(
-  import.meta.env.MODE === "development" 
-    ? "http://localhost:5001" 
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5001"
     : "https://wishperwall.onrender.com"
 );
 
@@ -21,9 +20,8 @@ const HomePage = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isRateLimited, setIsRateLimited] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
-  
+
   // Pagination state
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -50,11 +48,13 @@ const HomePage = () => {
       } else {
         setNotes((prev) => (pageNum === 1 ? res.data : [...prev, ...res.data]));
       }
-      setIsRateLimited(false);
     } catch (error) {
       console.log("Error fetching notes", error);
       if (error.response?.status === 429) {
-        setIsRateLimited(true);
+        toast.error("Slow down! Too many requests. Wait a moment.", {
+          duration: 5000,
+          icon: "⏱️",
+        });
       } else {
         toast.error("Failed to load notes");
       }
@@ -112,38 +112,33 @@ const HomePage = () => {
         </p>
       </header>
 
-      {isRateLimited ? (
-        <RateLimitedUI />
-      ) : (
-        <div className="max-w-7xl mx-auto">
-          {loading && page === 1 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-square bg-gray-200/50 dark:bg-gray-700/50 rounded-sm animate-pulse"
-                />
-              ))}
-            </div>
-          ) : notes.length === 0 ? (
-            <NotesNotFound />
-          ) : (
-            /* Grid Layout for predictable filling */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {notes.map((note) => (
-                <NoteCard key={note._id} note={note} setNotes={setNotes} />
-              ))}
-            </div>
-          )}
-          
-          {/* Infinite Scroll Loader */}
-          {hasMore && notes.length > 0 && (
-            <div ref={ref} className="flex justify-center py-8">
-              <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin" />
-            </div>
-          )}
-        </div>
-      )}
+      <div className="max-w-7xl mx-auto">
+        {loading && page === 1 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="aspect-square bg-gray-200/50 dark:bg-gray-700/50 rounded-sm animate-pulse"
+              />
+            ))}
+          </div>
+        ) : notes.length === 0 ? (
+          <NotesNotFound />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {notes.map((note) => (
+              <NoteCard key={note._id} note={note} setNotes={setNotes} />
+            ))}
+          </div>
+        )}
+
+        {/* Infinite Scroll Loader */}
+        {hasMore && notes.length > 0 && (
+          <div ref={ref} className="flex justify-center py-8">
+            <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin" />
+          </div>
+        )}
+      </div>
 
       {/* Floating Action Button */}
       <motion.button
@@ -159,7 +154,7 @@ const HomePage = () => {
       <CreateNoteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onNoteCreated={() => {}} // Handled by Socket.io
+        onNoteCreated={() => { }} // Handled by Socket.io
       />
     </div>
   );

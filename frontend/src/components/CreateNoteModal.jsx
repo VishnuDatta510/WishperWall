@@ -43,7 +43,14 @@ const CreateNoteModal = ({ isOpen, onClose, onNoteCreated }) => {
       toast.success("Note stuck to the wall!");
     } catch (error) {
       console.error("Error creating note:", error);
-      toast.error("Failed to post note");
+      if (error.response?.status === 429) {
+        toast.error("Slow down! You're posting too fast. Wait a moment and try again.", {
+          duration: 5000,
+          icon: "⏱️",
+        });
+      } else {
+        toast.error("Failed to post note");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -108,11 +115,10 @@ const CreateNoteModal = ({ isOpen, onClose, onNoteCreated }) => {
                         key={color.name}
                         type="button"
                         onClick={() => setSelectedColor(color.value)}
-                        className={`w-6 h-6 rounded-full border border-black/10 transition-transform ${
-                          selectedColor === color.value
+                        className={`w-6 h-6 rounded-full border border-black/10 transition-transform ${selectedColor === color.value
                             ? "scale-125 ring-2 ring-gray-400 ring-offset-1"
                             : "hover:scale-110"
-                        }`}
+                          }`}
                         style={{ backgroundColor: color.value }}
                         aria-label={`Select ${color.name}`}
                       />
