@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Moon, Sun } from "lucide-react";
+import { Plus, Moon, Sun, Linkedin, Github } from "lucide-react";
 import { motion } from "framer-motion";
 import api from "../lib/axios";
 import toast from "react-hot-toast";
@@ -90,17 +90,43 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen p-4 md:p-8 transition-colors duration-300">
-      {/* Theme Toggle */}
-      <button
-        onClick={toggleTheme}
-        className="fixed top-6 right-6 p-3 rounded-full bg-white/80 dark:bg-gray-800/80 shadow-lg backdrop-blur-sm z-50 hover:scale-110 transition-all duration-200 group"
-      >
-        {theme === "light" ? (
-          <Moon className="size-6 text-gray-700 group-hover:text-indigo-600" />
-        ) : (
-          <Sun className="size-6 text-yellow-400 group-hover:text-yellow-300" />
-        )}
-      </button>
+      {/* Social Links & Theme Toggle */}
+      <div className="fixed top-6 right-6 flex items-center gap-3 z-50">
+        {/* LinkedIn */}
+        <a
+          href="https://www.linkedin.com/in/vishnudattagb/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-3 rounded-full bg-white/80 dark:bg-gray-800/80 shadow-lg backdrop-blur-sm hover:scale-110 transition-all duration-200 group"
+          aria-label="LinkedIn Profile"
+        >
+          <Linkedin className="size-6 text-gray-700 dark:text-gray-300 group-hover:text-[#0A66C2] transition-colors" />
+        </a>
+
+        {/* GitHub */}
+        <a
+          href="https://github.com/VishnuDatta510/WishperWall"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-3 rounded-full bg-white/80 dark:bg-gray-800/80 shadow-lg backdrop-blur-sm hover:scale-110 transition-all duration-200 group"
+          aria-label="GitHub Repository"
+        >
+          <Github className="size-6 text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
+        </a>
+
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-3 rounded-full bg-white/80 dark:bg-gray-800/80 shadow-lg backdrop-blur-sm hover:scale-110 transition-all duration-200 group"
+          aria-label="Toggle Theme"
+        >
+          {theme === "light" ? (
+            <Moon className="size-6 text-gray-700 group-hover:text-indigo-600" />
+          ) : (
+            <Sun className="size-6 text-yellow-400 group-hover:text-yellow-300" />
+          )}
+        </button>
+      </div>
 
       {/* Header */}
       <header className="mb-12 text-center pt-8">
